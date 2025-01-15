@@ -1,0 +1,8 @@
+fastapi/__pycache__
+fastapi/app/__pycache__
+fastapi/app/core/__pycache__
+fastapi/app/modules/admin/__pycache__
+fastapi/app/modules/wisata/__pycache__
+fastapi/app/modules/pelanggan/__pycache__
+fastapi/app/modules/transaksi/__pycache__
+fastapi/app/modules/kendaraan/__pycache__

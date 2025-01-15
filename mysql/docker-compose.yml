@@ -1,0 +1,18 @@
+version: '3.8' # Versi Docker Compose yang digunakan
+services:
+  db:
+    image: mysql:8.0 # Gunakan image MySQL dari Docker Hub
+    container_name: deden_mysql # Nama container
+    restart: always # Container akan otomatis restart jika berhenti
+    environment:
+      MYSQL_ROOT_PASSWORD: CandaMulu # Ganti dengan password root yang kuat
+      MYSQL_DATABASE: deden_project # Nama database yang dibuat otomatis
+      MYSQL_USER: deden # Nama user yang dibuat otomatis
+      MYSQL_PASSWORD: K0d!r # Password untuk user di atas
+    ports:
+      - "33065:3306" # Map port MySQL ke localhost
+    volumes:
+      - db_data:/var/lib/mysql # Persistensi data MySQL
+
+volumes:
+  db_data:
