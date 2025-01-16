@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr
 
 class WisataBase(BaseModel):
     nama: str
-    destinasi: str
+    destination: str
     benefit: str
     description: str
     price: int
@@ -14,7 +14,7 @@ class WisataCreate(WisataBase):
 class WisataResponse(WisataBase):
     id: int
     nama: str
-    destinasi: str
+    destination: str
     benefit: str
     description: str
     price: int

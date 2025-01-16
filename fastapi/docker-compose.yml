@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    restart: always
+    expose:
+      - "8000" # Ekspos port internal ke Nginx
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    ports:
+      - "443:443" # HTTPS
+      - "8000:8000" # HTTP untuk pengujian lokal, atau bisa dihapus jika tidak diperlukan
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/ssl/certs
+      - ./keys:/etc/ssl/private
+    depends_on:
+      - app
+    restart: always

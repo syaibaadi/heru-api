@@ -1,6 +1,6 @@
 import enum
 from sqlalchemy import Column, Integer, String, Text, DateTime, Enum
-from app.core.database import Base
+from core.database import Base
 
 class StatusTransaksiEnum(enum.Enum):
     SUCCESS = 'SUCCESS'

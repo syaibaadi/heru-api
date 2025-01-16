@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.core.database import get_db
+from core.database import get_db
 from . import crud, schemas
+from typing import List
 
 router = APIRouter()
 
-@router.get("", response_model=list[schemas.TransaksiOut])
+@router.get("", response_model=List[schemas.TransaksiOut])
 async def read_transaksis(db: Session = Depends(get_db)):
     return crud.get_transaksis(db)
 

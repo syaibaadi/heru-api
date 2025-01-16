@@ -1,11 +1,12 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.core.database import get_db
+from core.database import get_db
 from . import crud, schemas
 
 router = APIRouter()
 
-@router.get("", response_model=list[schemas.KendaraanResponse])
+@router.get("", response_model=List[schemas.KendaraanResponse])
 async def read_kendaraans(db: Session = Depends(get_db)):
     return crud.get_kendaraans(db)
 

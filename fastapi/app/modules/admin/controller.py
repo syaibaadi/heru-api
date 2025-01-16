@@ -1,11 +1,12 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.core.database import get_db
+from core.database import get_db
 from . import crud, schemas
 
 router = APIRouter()
 
-@router.get("", response_model=list[schemas.AdminResponse])
+@router.get("", response_model=List[schemas.AdminResponse])
 async def read_users(db: Session = Depends(get_db)):
     return crud.get_users(db)
 
@@ -16,7 +17,7 @@ async def create_new_user(user: schemas.AdminCreate, db: Session = Depends(get_d
         raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db, user)
 
-@router.get("/{user_id}", response_model=list[schemas.AdminResponse])
+@router.get("/{user_id}", response_model=List[schemas.AdminResponse])
 async def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id)
 

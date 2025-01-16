@@ -3,6 +3,7 @@ from pydantic import BaseModel, EmailStr
 class AdminBase(BaseModel):
     nama: str
     email: str
+    password: str
 
 class AdminCreate(AdminBase):
     nama: str
@@ -13,6 +14,7 @@ class AdminResponse(AdminBase):
     id: int
     nama: str
     email: str
+    password: str
 
     class Config:
         from_attributes = True

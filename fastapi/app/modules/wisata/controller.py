@@ -1,23 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.core.database import get_db
+from core.database import get_db
 from . import crud, schemas
+from typing import List
 
 router = APIRouter()
 
-@router.get("", response_model=list[schemas.WisataResponse])
+@router.get("", response_model=List[schemas.WisataResponse])
 async def read_wisatas(db: Session = Depends(get_db)):
     return crud.get_wisatas(db)
 
 @router.post("", response_model=schemas.WisataCreate)
-async def create_new_user(wisata: schemas.WisataCreate, db: Session = Depends(get_db)):
+async def create_new_wisata(wisata: schemas.WisataCreate, db: Session = Depends(get_db)):
     existing_wisata = db.query(crud.Wisata).filter(crud.Wisata.nama == wisata.nama).first()
     if existing_wisata:
         raise HTTPException(status_code=400, detail="Wisata already registered")
     return crud.create_wisata(db, wisata)
 
 @router.get("/{wisata_id}", response_model=schemas.WisataResponse)
-async def read_user(wisata_id: int, db: Session = Depends(get_db)):
+async def read_wisata(wisata_id: int, db: Session = Depends(get_db)):
     db_wisata = crud.get_wisata(db, wisata_id)
 
     if db_wisata is None:
