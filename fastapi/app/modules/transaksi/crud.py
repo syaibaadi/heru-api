@@ -9,7 +9,7 @@ def get_transaksis(db: Session):
 
 # post data
 def create_transaksi(db: Session, transaksi: TransaksiCreate):
-    new_transaction = Transaksi(customer_id=transaksi.customer_id, wisata_id=transaksi.wisata_id, kendaraan_id=transaksi.kendaraan_id, book_date=transaksi.book_date, pick_loc=transaksi.pick_loc, total_users=transaksi.total_users, total_price=transaksi.total_price, status='PENDING', image=transaksi.image)
+    new_transaction = Transaksi(nama=transaksi.nama, telfon=transaksi.telfon, alamat=transaksi.alamat, book_date=transaksi.book_date, total_user=transaksi.total_user, description = transaksi.description, total_price=transaksi.total_price, status='PENDING',wisata = transaksi.wisata_id, total_price = transaksi.total_price)
     db.add(new_transaction)
     db.commit()
     db.refresh(new_transaction)
@@ -20,17 +20,19 @@ def get_transaksi(db: Session, transaksi_id: int):
     return db.query(Transaksi).filter(Transaksi.id == transaksi_id).first()
 
 # edit data
-def update_transaksi(db: Session, transaksi_id: int, customer_id: int, wisata_id: int, kendaraan_id: int, book_date: datetime, pic_loc: str, total_users: int, total_price: int, image: str):
+def update_transaksi(db: Session, transaksi_id: int, nama: str, telfon: str, alamat: str, book_date: datetime, total_user: int, description: str, status: str, wisata_id : int, total_price: int):
     transaksi = db.query(Transaksi).filter(Transaksi.id == transaksi_id).first()
     if transaksi:
-        transaksi.customer_id = customer_id
-        transaksi.wisata_id = wisata_id
-        transaksi.kendaraan_id = kendaraan_id
+        transaksi.nama = nama
+        transaksi.telfon = telfon
+        transaksi.alamat = alamat
         transaksi.book_date = book_date
-        transaksi.pic_loc = pic_loc
-        transaksi.total_users = total_users
+        transaksi.total_user = total_user
+        transaksi.description = description
+        transaksi.status = status
+        transaksi.wisata_id = wisata_id
         transaksi.total_price = total_price
-        transaksi.image = image
+        
         db.commit()
         db.refresh(transaksi)
     return transaksi
