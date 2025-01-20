@@ -9,7 +9,7 @@ def get_transaksis(db: Session):
 
 # post data
 def create_transaksi(db: Session, transaksi: TransaksiCreate):
-    new_transaction = Transaksi(nama=transaksi.nama, telfon=transaksi.telfon, alamat=transaksi.alamat, book_date=transaksi.book_date, total_user=transaksi.total_user, description = transaksi.description, total_price=transaksi.total_price, status='PENDING',wisata = transaksi.wisata_id, total_price = transaksi.total_price)
+    new_transaction = Transaksi(nama=transaksi.nama, telfon=transaksi.telfon, alamat=transaksi.alamat, book_date=transaksi.book_date, total_user=transaksi.total_user, description = transaksi.description, status='PENDING',wisata = transaksi.wisata_id, total_price = transaksi.total_price)
     db.add(new_transaction)
     db.commit()
     db.refresh(new_transaction)
