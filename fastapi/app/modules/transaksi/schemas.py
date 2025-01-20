@@ -9,15 +9,17 @@ class StatusTransaksiEnum(str, Enum):
     PENDING = 'PENDING'
     
 class TransaksiBase(BaseModel):
-    customer_id: int
-    wisata_id: int
-    kendaraan_id: int
+    # id: int
+    nama: str
+    telfon: str 
+    alamat: str 
     book_date: Optional[datetime] = None
-    pick_loc: Optional[str] = None
-    total_users: Optional[int] = None
+    total_user: Optional[int] = None
+    description: str
     total_price: Optional[int] = None
     status: Optional[StatusTransaksiEnum] = StatusTransaksiEnum.PENDING
-    image: str
+    wisata_id: int 
+    total_price: int
 
 class TransaksiCreate(TransaksiBase):
     pass

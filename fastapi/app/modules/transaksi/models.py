@@ -11,13 +11,15 @@ class Transaksi(Base):
     __tablename__ = "transaksi"
     
     id = Column(Integer, primary_key=True, index=True)
-    customer_id = Column(Integer, nullable=False)
-    wisata_id = Column(Integer, nullable=False)
-    kendaraan_id = Column(Integer, nullable=False)
+    nama = Column(String, nullable=False)
+    telfon = Column(String, nullable=False)
+    alamat = Column(String, nullable=False)
     book_date = Column(DateTime, nullable=True)
-    pick_loc = Column(Text, nullable=True)
-    total_users = Column(Integer, nullable=True)
-    total_price = Column(Integer, nullable=True)
+    total_user = Column(Integer, nullable=True)
+    description = Column(String, nullable=False)
     status = Column(Enum(StatusTransaksiEnum), default=StatusTransaksiEnum.PENDING, nullable=True)
+    wisata_id = Column(Integer, nullable=False)
+    total_price = Column(Integer, nullable=True)
+    
     
     
