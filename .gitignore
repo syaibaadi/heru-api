@@ -7,3 +7,4 @@ fastapi/app/modules/wisata/__pycache__
 fastapi/app/modules/pelanggan/__pycache__
 fastapi/app/modules/transaksi/__pycache__
 fastapi/app/modules/kendaraan/__pycache__
+fastapi/app/modules/midtrans/__pycache__
