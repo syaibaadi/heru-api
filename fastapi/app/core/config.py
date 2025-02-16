@@ -11,7 +11,7 @@ class Settings:
     DATABASE_NAME = os.getenv("DB_NAME")
     DATABASE_PORT = os.getenv("DB_PORT")
 
-    DATABASE_URL = f"mysql+pymysql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{URL_LOCAL}:{DATABASE_PORT}/{DATABASE_NAME}"
+    DATABASE_URL = f"mysql+pymysql://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{URL_LOCAL}:33065/{DATABASE_NAME}"
     APP_NAME = "Ayo Lulus Den!!! Aku Padamu"
 
 settings = Settings()
