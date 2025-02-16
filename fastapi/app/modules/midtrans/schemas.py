@@ -54,4 +54,4 @@ class PaymentLinkRequest(BaseModel):
     lastname: str 
     email: str 
     phone: str
-
+    order_id: str

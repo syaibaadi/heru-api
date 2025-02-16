@@ -3,8 +3,16 @@ import uuid
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException
+from core.database import get_db
+from sqlalchemy.orm import Session
 from . import schemas
+from modules.transaksi import crud
+from modules.transaksi.models import Transaksi
 from typing import List
+import hmac
+import hashlib
+import json
+
 
 router = APIRouter()
 
@@ -15,8 +23,8 @@ MIDTRANS_API_URL = "https://api.sandbox.midtrans.com/v1/payment-links"
 async def create_payment_link(request_body: schemas.PaymentLinkRequest):
     try:
         # Generate unique order_id and payment_link_id
-        order_id = str(uuid.uuid4())[:8]  # Example unique ID
-        payment_link_id = order_id
+        # order_id = str(uuid.uuid4())[:8]  # Example unique ID
+        # payment_link_id = order_id
 
         # Set expiry start_time and duration dynamically
         start_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S+07:00")
@@ -26,9 +34,9 @@ async def create_payment_link(request_body: schemas.PaymentLinkRequest):
         # Build the payload
         payload = {
             "transaction_details": {
-                "order_id": order_id,
+                "order_id": request_body.order_id,
                 "gross_amount": request_body.price,  # Use price from the request body
-                "payment_link_id": payment_link_id
+                "payment_link_id": request_body.order_id
             },
             "customer_required": True,
             "credit_card": {
@@ -94,8 +102,53 @@ async def create_payment_link(request_body: schemas.PaymentLinkRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# @router.post("/webhook")
+# async def handle_webhook(payload: dict):
+#     # Handle webhook logic here
+#     print("Webhook received:", payload)
+#     return {"status": "success"}
+
+def verify_signature(payload: dict, secret_key: str) -> bool:
+    # Mengambil signature_key dari payload dan membandingkannya dengan hasil HMAC SHA256
+    signature = payload.get('signature_key')
+    payload_copy = payload.copy()
+    payload_copy.pop('signature_key')  # Jangan sertakan signature_key dalam perhitungan HMAC
+    payload_str = json.dumps(payload_copy, separators=(',', ':'))
+    
+    # HMAC dengan secret_key
+    calculated_signature = hmac.new(
+        secret_key.encode('utf-8'),
+        payload_str.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+
+    return signature == calculated_signature
+
+# Webhook handler
 @router.post("/webhook")
-async def handle_webhook(payload: dict):
-    # Handle webhook logic here
-    print("Webhook received:", payload)
-    return {"status": "success"}
+async def handle_webhook(payload: dict,db: Session = Depends(get_db)):
+    # Verify the signature first
+    secret_key = "Basic U0ItTWlkLXNlcnZlci1fZnV1d1NVZWk2Y0UtUnBGOEdGVE51al8="  # Ganti dengan server key Anda
+    if not verify_signature(payload.dict(), secret_key):
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    # Get the transaction from the database
+    transaction = db.query(Transaksi).filter(Transaksi.order_id == payload.order_id).first()
+
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    # Update the transaction status based on the transaction status received from Midtrans
+    if payload.transaction_status == "capture":
+        transaction.status = "PAID"
+    elif payload.transaction_status == "deny" or payload.transaction_status == "expire":
+        transaction.status = "FAILED"
+    elif payload.transaction_status == "pending":
+        transaction.status = "PENDING"
+    
+    # Commit the changes to the database
+    db.commit()
+    db.refresh(transaction)
+
+    # Return success response
+    return {"status": "success", "order_id": payload.order_id, "new_status": transaction.status}

@@ -10,7 +10,7 @@ router = APIRouter()
 async def read_transaksis(db: Session = Depends(get_db)):
     return crud.get_transaksis(db)
 
-@router.post("", response_model=schemas.TransaksiCreate)
+@router.post("", response_model=schemas.TransaksiOut)  # Ganti response_model menjadi TransaksiOut
 async def create_new_transaksi(transaksi: schemas.TransaksiCreate, db: Session = Depends(get_db)):
     return crud.create_transaksi(db, transaksi)
 

@@ -20,6 +20,6 @@ class Transaksi(Base):
     status = Column(Enum(StatusTransaksiEnum), default=StatusTransaksiEnum.PENDING, nullable=True)
     wisata_id = Column(Integer, nullable=False)
     total_price = Column(Integer, nullable=True)
-    
+    order_id = Column(String)
     
     

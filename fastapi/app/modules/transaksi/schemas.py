@@ -25,6 +25,7 @@ class TransaksiCreate(TransaksiBase):
 
 class TransaksiOut(TransaksiBase):
     id: int
+    order_id: str
 
     class Config:
         from_attributes = True
