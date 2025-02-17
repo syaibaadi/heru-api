@@ -50,6 +50,7 @@ async def handle_webhook(payload: dict, db: Session = Depends(get_db)):
         transaksi.status = "FAILED"  # Pembayaran gagal
 
     db.commit()  # Simpan perubahan di database
+    db.refresh(transaksi)
 
     return {"message": "Webhook diterima dan transaksi diperbarui", "order_id": trimmed_order_id}
 
