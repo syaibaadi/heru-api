@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from core.database import get_db
 from . import crud, schemas
@@ -25,26 +25,29 @@ async def read_transaksi(transaksi_id: int, db: Session = Depends(get_db)):
     return db_transaksi
 
 @router.post("/webhook")
-async def handle_webhook(payload: dict, db: Session = Depends(get_db)):
-    # Ambil order_id dari payload
-    order_id = payload.get('order_id')
-    status_payment = payload.get('status')  # Misalnya status pembayaran ada di payload
+async def handle_webhook(request: Request, db: Session = Depends(get_db)):
+    payload = await request.json()  # Mendapatkan data dari webhook
     
-    # Periksa jika status adalah "PAID"
-    if status_payment == "PAID":
-        # Cari transaksi berdasarkan order_id
-        transaksi = db.query(Transaksi).filter(Transaksi.order_id == order_id).first()
+    order_id = payload.get("order_id")
+    transaction_status = payload.get("transaction_status")
 
-        if transaksi:
-            # Jika transaksi ditemukan, ubah status menjadi PAID
-            transaksi.status = "PAID"
-            db.commit()  # Simpan perubahan ke database
-            return {"message": "Status pembayaran berhasil diperbarui", "order_id": order_id}
-        else:
-            return {"error": "Transaksi tidak ditemukan", "order_id": order_id}
-    
-    return {"error": "Status pembayaran tidak valid", "status": status_payment}
+    # Cek apakah transaksi ada di database
+    transaksi = db.query(Transaksi).filter(Transaksi.order_id == order_id).first()
 
+    if not transaksi:
+        return {"error": "Transaksi tidak ditemukan", "order_id": order_id}
+
+    # Update status transaksi berdasarkan status dari Midtrans
+    if transaction_status in ["settlement", "capture"]:
+        transaksi.status = "SUCCESS"  # Pembayaran sukses
+    elif transaction_status in ["pending"]:
+        transaksi.status = "PENDING"  # Masih menunggu pembayaran
+    elif transaction_status in ["deny", "expire", "cancel"]:
+        transaksi.status = "FAILED"  # Pembayaran gagal
+
+    db.commit()  # Simpan perubahan di database
+
+    return {"message": "Webhook diterima dan transaksi diperbarui", "order_id": order_id}
 # @router.put("/{transaksi_id}", response_model=schemas.TransaksiOut)
 # def update_wisata(transaksi_id: int, wisata: schemas.TransaksiCreate, db: Session = Depends(get_db)):
 #     db_wisata = crud.update_wisata(db, transaksi_id, wisata.nama)
