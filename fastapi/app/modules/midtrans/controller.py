@@ -4,6 +4,7 @@ import uuid
 import requests
 from fastapi import APIRouter, Depends, HTTPException
 from core.database import get_db
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from . import schemas
 from modules.transaksi import crud
@@ -108,47 +109,63 @@ async def create_payment_link(request_body: schemas.PaymentLinkRequest):
 #     print("Webhook received:", payload)
 #     return {"status": "success"}
 
-def verify_signature(payload: dict, secret_key: str) -> bool:
-    # Mengambil signature_key dari payload dan membandingkannya dengan hasil HMAC SHA256
-    signature = payload.get('signature_key')
-    payload_copy = payload.copy()
-    payload_copy.pop('signature_key')  # Jangan sertakan signature_key dalam perhitungan HMAC
-    payload_str = json.dumps(payload_copy, separators=(',', ':'))
+# def verify_signature(payload: dict, secret_key: str) -> bool:
+#     # Mengambil signature_key dari payload dan membandingkannya dengan hasil HMAC SHA256
+#     signature = payload.get('signature_key')
     
-    # HMAC dengan secret_key
-    calculated_signature = hmac.new(
-        secret_key.encode('utf-8'),
-        payload_str.encode('utf-8'),
-        hashlib.sha256
-    ).hexdigest()
-
-    return signature == calculated_signature
-
-# Webhook handler
-@router.post("/webhook")
-async def handle_webhook(payload: dict,db: Session = Depends(get_db)):
-    # Verify the signature first
-    secret_key = "Basic U0ItTWlkLXNlcnZlci1fZnV1d1NVZWk2Y0UtUnBGOEdGVE51al8="  # Ganti dengan server key Anda
-    if not verify_signature(payload.dict(), secret_key):
-        raise HTTPException(status_code=400, detail="Invalid signature")
-
-    # Get the transaction from the database
-    transaction = db.query(Transaksi).filter(Transaksi.order_id == payload.order_id).first()
-
-    if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-
-    # Update the transaction status based on the transaction status received from Midtrans
-    if payload.transaction_status == "capture":
-        transaction.status = "PAID"
-    elif payload.transaction_status == "deny" or payload.transaction_status == "expire":
-        transaction.status = "FAILED"
-    elif payload.transaction_status == "pending":
-        transaction.status = "PENDING"
+#     # Urutkan parameter sesuai dengan dokumentasi Midtrans
+#     order_id = payload.get('order_id')
+#     transaction_status = payload.get('transaction_status')
+#     gross_amount = payload.get('gross_amount')  # pastikan gross_amount ada di payload
+#     payment_type = payload.get('payment_type')  # pastikan payment_type ada di payload
     
-    # Commit the changes to the database
-    db.commit()
-    db.refresh(transaction)
+#     # Membuat string untuk perhitungan HMAC
+#     payload_str = f"{order_id}|{transaction_status}|{gross_amount}|{payment_type}"
 
-    # Return success response
-    return {"status": "success", "order_id": payload.order_id, "new_status": transaction.status}
+#     # HMAC dengan secret_key
+#     calculated_signature = hmac.new(
+#         secret_key.encode('utf-8'),
+#         payload_str.encode('utf-8'),
+#         hashlib.sha256
+#     ).hexdigest()
+
+#     return calculated_signature
+
+# class WebhookPayload(BaseModel):
+#     order_id: str
+#     transaction_status: str
+#     gross_amount: int
+#     payment_type: str
+#     signature_key: str
+
+# # Webhook handler
+# @router.post("/webhook")
+# async def handle_webhook(payload: WebhookPayload, db: Session = Depends(get_db)):
+#     # Verify the signature first
+#     secret_key = "SB-Mid-server-_fuuwSUei6cE-RpF8GFTNuj_"  # Ganti dengan server key Anda
+#     # if not verify_signature(payload.dict(), secret_key):
+#     #     raise HTTPException(status_code=400, detail="Invalid signature")
+
+#     test = verify_signature(payload.dict(), secret_key)
+
+#     # # Get the transaction from the database
+#     # transaction = db.query(Transaksi).filter(Transaksi.order_id == payload.order_id).first()
+
+#     # if not transaction:
+#     #     raise HTTPException(status_code=404, detail="Transaction not found")
+
+#     # # Update the transaction status based on the transaction status received from Midtrans
+#     # if payload.transaction_status == "capture":
+#     #     transaction.status = "PAID"
+#     # elif payload.transaction_status == "deny" or payload.transaction_status == "expire":
+#     #     transaction.status = "FAILED"
+#     # elif payload.transaction_status == "pending":
+#     #     transaction.status = "PENDING"
+    
+#     # # Commit the changes to the database
+#     # db.commit()
+#     # db.refresh(transaction)
+
+#     # Return success response
+#     # return {"status": "success", "order_id": payload.order_id, "new_status": transaction.status}
+#     return {"signature": test}

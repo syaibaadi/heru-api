@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from core.database import get_db
 from . import crud, schemas
 from typing import List
+from .models import Transaksi
 
 router = APIRouter()
 
@@ -22,6 +23,27 @@ async def read_transaksi(transaksi_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code = 404, detail="Transaksi Not Found")
     
     return db_transaksi
+
+@router.post("/webhook")
+async def handle_webhook(payload: dict, db: Session = Depends(get_db)):
+    # Ambil order_id dari payload
+    order_id = payload.get('order_id')
+    status_payment = payload.get('status')  # Misalnya status pembayaran ada di payload
+    
+    # Periksa jika status adalah "PAID"
+    if status_payment == "PAID":
+        # Cari transaksi berdasarkan order_id
+        transaksi = db.query(Transaksi).filter(Transaksi.order_id == order_id).first()
+
+        if transaksi:
+            # Jika transaksi ditemukan, ubah status menjadi PAID
+            transaksi.status = "PAID"
+            db.commit()  # Simpan perubahan ke database
+            return {"message": "Status pembayaran berhasil diperbarui", "order_id": order_id}
+        else:
+            return {"error": "Transaksi tidak ditemukan", "order_id": order_id}
+    
+    return {"error": "Status pembayaran tidak valid", "status": status_payment}
 
 # @router.put("/{transaksi_id}", response_model=schemas.TransaksiOut)
 # def update_wisata(transaksi_id: int, wisata: schemas.TransaksiCreate, db: Session = Depends(get_db)):
