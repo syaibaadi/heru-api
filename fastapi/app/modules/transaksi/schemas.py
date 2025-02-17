@@ -16,7 +16,7 @@ class TransaksiBase(BaseModel):
     book_date: Optional[datetime] = None
     total_user: Optional[int] = None
     description: str
-    status: Optional[StatusTransaksiEnum] = StatusTransaksiEnum.PENDING
+    status: Optional[StatusTransaksiEnum]
     wisata_id: int 
     total_price: int
 
