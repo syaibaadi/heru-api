@@ -25,7 +25,7 @@ async def read_transaksi(transaksi_id: int, db: Session = Depends(get_db)):
     return db_transaksi
 
 @router.post("/webhook")
-async def handle_webhook(payload = dict, db: Session = Depends(get_db)):
+async def handle_webhook(payload : dict, db: Session = Depends(get_db)):
     
     order_id = payload.get("order_id")
     transaction_status = payload.get("transaction_status")
