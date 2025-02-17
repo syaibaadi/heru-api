@@ -25,16 +25,21 @@ async def read_transaksi(transaksi_id: int, db: Session = Depends(get_db)):
     return db_transaksi
 
 @router.post("/webhook")
-async def handle_webhook(payload : dict, db: Session = Depends(get_db)):
-    
-    order_id = payload.get("order_id")
+async def handle_webhook(payload: dict, db: Session = Depends(get_db)):
+    order_id = payload.get("order_id")  # Order ID dari Midtrans (bisa memiliki tambahan angka)
     transaction_status = payload.get("transaction_status")
 
-    # Cek apakah transaksi ada di database
-    transaksi = db.query(Transaksi).filter(Transaksi.order_id == order_id).first()
+    if not order_id:
+        return {"error": "Order ID tidak ditemukan dalam payload"}
+
+    # Potong order_id menjadi 36 karakter pertama (format UUID)
+    trimmed_order_id = order_id[:36]
+
+    # Cek apakah transaksi ada di database berdasarkan order_id yang telah dipotong
+    transaksi = db.query(Transaksi).filter(Transaksi.order_id == trimmed_order_id).first()
 
     if not transaksi:
-        return {"error": "Transaksi tidak ditemukan", "order_id": order_id}
+        return {"error": "Transaksi tidak ditemukan", "order_id": trimmed_order_id}
 
     # Update status transaksi berdasarkan status dari Midtrans
     if transaction_status in ["settlement", "capture"]:
@@ -46,7 +51,8 @@ async def handle_webhook(payload : dict, db: Session = Depends(get_db)):
 
     db.commit()  # Simpan perubahan di database
 
-    return {"message": "Webhook diterima dan transaksi diperbarui", "order_id": order_id}
+    return {"message": "Webhook diterima dan transaksi diperbarui", "order_id": trimmed_order_id}
+
 # @router.put("/{transaksi_id}", response_model=schemas.TransaksiOut)
 # def update_wisata(transaksi_id: int, wisata: schemas.TransaksiCreate, db: Session = Depends(get_db)):
 #     db_wisata = crud.update_wisata(db, transaksi_id, wisata.nama)
