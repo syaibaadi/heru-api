@@ -1,3 +1,4 @@
+# .module/kendaraan/models.py
 from sqlalchemy import Column, Integer, String, Text
 from core.database import Base
 
@@ -9,4 +10,3 @@ class Kendaraan(Base):
     type = Column(String(50), index=True)
     capacity = Column(Integer, index=True)
     number = Column(String(50), unique=True, index=True)
-    

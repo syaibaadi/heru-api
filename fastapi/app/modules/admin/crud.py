@@ -19,12 +19,10 @@ def create_user(db: Session, user: AdminBase):
 def get_user(db: Session, user_id: int):
     return db.query(Admin).filter(Admin.id == user_id).first()
 # edit data
-def update_user(db: Session, user_id: int, nama: str, phone:str, address: str, email: str, password: str):
+def update_user(db: Session, user_id: int, nama: str, email: str, password: str):
     user = db.query(Admin).filter(Admin.id == user_id).first()
     if user:
         user.nama = nama
-        user.phone = phone
-        user.address = address
         user.email = email
         user.password = password
         db.commit()

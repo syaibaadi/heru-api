@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import relationship
 from core.database import Base
 
 class Wisata(Base):
@@ -11,4 +12,9 @@ class Wisata(Base):
     description = Column(String(50), index=True)
     price = Column(String(50))
     image = Column(Text)
+    kendaraan_id = Column(Integer, ForeignKey("kendaraan.id"))  # ForeignKey yang merujuk ke tabel kendaraan
+    min_person = Column(Integer)
+    max_person = Column(Integer)
     
+    # Mengubah backref untuk menghindari konflik dengan nama yang sudah ada
+    kendaraan = relationship("Kendaraan", backref="wisata_relasi")

@@ -28,7 +28,7 @@ async def read_user(user_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{user_id}", response_model=schemas.AdminResponse)
 def update_user(user_id: int, user: schemas.AdminCreate, db: Session = Depends(get_db)):
-    db_user = crud.update_user(db, user_id, user.name, user.email)
+    db_user = crud.update_user(db, user_id, user.nama, user.email, user.password)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user

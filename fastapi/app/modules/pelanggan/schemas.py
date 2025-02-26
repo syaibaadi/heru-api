@@ -5,6 +5,7 @@ class UserBase(BaseModel):
     phone: str
     address: str
     email: str
+    password: str
 
 class UserCreate(UserBase):
     nama: str
@@ -19,6 +20,7 @@ class UserResponse(UserBase):
     phone: str
     address: str
     email: str
+    password: str
 
     class Config:
         from_attributes = True

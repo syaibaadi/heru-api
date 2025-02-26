@@ -28,7 +28,7 @@ async def read_kendaraan(kendaraan_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{kendaraan_id}", response_model=schemas.KendaraanResponse)
 def update_kendaraan(kendaraan_id: int, kendaraan: schemas.KendaraanCreate, db: Session = Depends(get_db)):
-    db_kendaraan = crud.update_kendaraan(db, kendaraan_id, kendaraan.nama)
+    db_kendaraan = crud.update_kendaraan(db, kendaraan_id, kendaraan.nama, kendaraan.type, kendaraan.capacity, kendaraan.number)
     if db_kendaraan is None:
         raise HTTPException(status_code=404, detail="Kendaraan not found")
     return db_kendaraan
