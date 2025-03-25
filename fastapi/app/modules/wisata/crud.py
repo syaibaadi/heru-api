@@ -9,7 +9,7 @@ def get_wisatas(db: Session):
 
 # Post data
 def create_wisata(db: Session, wisata: WisataCreate):
-    new_wisata = Wisata(nama=wisata.nama, destination=wisata.destination, benefit=wisata.benefit, description=wisata.description, price=wisata.price, image=wisata.image, kendaraan_id=wisata.kendaraan_id, min_person = wisata.min_person, max_person = wisata.max_person)
+    new_wisata = Wisata(nama=wisata.nama, destination=wisata.destination, benefit=wisata.benefit, description=wisata.description, price=wisata.price, image=wisata.image, min_person = wisata.min_person, max_person = wisata.max_person)
     db.add(new_wisata)
     db.commit()
     db.refresh(new_wisata)
@@ -20,7 +20,7 @@ def get_wisata(db: Session, wisata_id: int):
     return db.query(Wisata).filter(Wisata.id == wisata_id).first()
 
 # Update data
-def update_wisata(db: Session, wisata_id: int, nama: str, destination:str, benefit: str, description: str, price: int, image: str, kendaraan_id: int, min_person: int, max_person: int):
+def update_wisata(db: Session, wisata_id: int, nama: str, destination:str, benefit: str, description: str, price: int, image: str, min_person: int, max_person: int):
     wisata = db.query(Wisata).filter(Wisata.id == wisata_id).first()
     if wisata:
         wisata.nama = nama
@@ -29,7 +29,6 @@ def update_wisata(db: Session, wisata_id: int, nama: str, destination:str, benef
         wisata.description = description
         wisata.price = price
         wisata.image = image
-        wisata.kendaraan_id = kendaraan_id
         wisata.min_person = min_person
         wisata.max_person = max_person
         db.commit()

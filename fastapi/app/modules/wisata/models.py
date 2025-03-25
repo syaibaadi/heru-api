@@ -12,7 +12,6 @@ class Wisata(Base):
     description = Column(String(50), index=True)
     price = Column(String(50))
     image = Column(Text)
-    kendaraan_id = Column(Integer, ForeignKey("kendaraan.id"))  # ForeignKey yang merujuk ke tabel kendaraan
     min_person = Column(Integer)
     max_person = Column(Integer)
     
