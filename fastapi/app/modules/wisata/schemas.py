@@ -8,7 +8,6 @@ class WisataBase(BaseModel):
     description: str
     price: int
     image: str
-    kendaraan_id: int
     min_person: int 
     max_person: int
 
@@ -25,7 +24,6 @@ class WisataResponse(WisataBase):
     image: str
     min_person: int 
     max_person: int
-    kendaraan_id: int
     kendaraan_nama: str  # Menambahkan kendaraan_nama untuk response
     kendaraan_capacity: int  # Menambahkan kendaraan_capacity untuk response
 
