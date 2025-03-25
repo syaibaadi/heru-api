@@ -15,5 +15,3 @@ class Wisata(Base):
     min_person = Column(Integer)
     max_person = Column(Integer)
     
-    # Mengubah backref untuk menghindari konflik dengan nama yang sudah ada
-    kendaraan = relationship("Kendaraan", backref="wisata_relasi")
